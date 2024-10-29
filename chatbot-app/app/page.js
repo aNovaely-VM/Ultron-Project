@@ -51,7 +51,7 @@ export default function ChatBot() {
 
       <ImageUltron/>
 
-      <form onSubmit={sendMessage} style={{ marginTop: '10px' }}>
+      <form onSubmit={sendMessage} style={{ marginTop: '10px' , display:'flex'}}>
         <input
           type="text"
           value={input}
@@ -60,7 +60,7 @@ export default function ChatBot() {
           style={{width: '50%' }}
           disabled={isLoading}
         />
-        <button type="submit" style={{ width: '20%' }} disabled={isLoading}>
+        <button type="submit" style={{ width: '20%', display:'flex'}} disabled={isLoading}>
           {isLoading ? 'Envoi...' : 'Envoyer'}
         </button>
       </form>

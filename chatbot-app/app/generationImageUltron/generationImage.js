@@ -11,31 +11,25 @@ export default function ImageUltron() {
         '/ImageBlablaUltron2d/Ultron_vide.png',
     ];
 
-    const [imageSrc, setImageSrc] = useState(images[0]);
+    const [imageIndex, setImageIndex] = useState(0);
 
     useEffect(() => {
-        const updateImage = () => {
-            const currentSeconds = new Date().getSeconds();
-            const index = Math.floor(currentSeconds / 3) % images.length;
-            setImageSrc(images[index]);
-        };
-
-        updateImage(); // Appel initial
-        const intervalId = setInterval(updateImage, 3000); // Mettre à jour toutes les 3 secondes
+        const intervalId = setInterval(() => {
+            setImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+        }, 500); // Changer d'image toutes les 0.1 secondes
 
         return () => clearInterval(intervalId); // Nettoyage à la désinstallation
     }, []);
 
     return (
-        <div>
-            <h1>Image qui change toutes les 3 secondes</h1>
-            {imageSrc && (
+        <div style={{paddingTop: '10%', display:'flex'}}>
+            {images[imageIndex] && (
                 <Image
-                    src={imageSrc}
-                    // src= '/ImageBlablaUltron2d/Ultron_A.png'
+                    src={images[imageIndex]}
                     alt="Image changeante"
-                    width={500}
-                    height={300}
+                    width={180}
+                    height={140}
+                    onError={() => setImageIndex((prevIndex) => (prevIndex + 1) % images.length)}// Passer à l'image suivante si erreur
                 />
             )}
         </div>
