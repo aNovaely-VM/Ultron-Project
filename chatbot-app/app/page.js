@@ -1,5 +1,6 @@
 "use client";
 import { useState } from 'react';
+import ImageUltron from '@/app/generationImageUltron/generationImage';
 
 export default function ChatBot() {
   const [messages, setMessages] = useState([]);
@@ -39,24 +40,27 @@ export default function ChatBot() {
 
   return (
     <div style={{ padding: '20px' }}>
-      <h1>Chatbot avec Cohere</h1>
-      <div style={{ border: '1px solid #ccc', padding: '10px', maxHeight: '300px', overflowY: 'scroll' }}>
+      <h1 style={{textAlign: 'center'}}>Chatbot avec Cohere</h1>
+      <div style={{ border: '1px solid #ccc', padding: '20px', maxHeight: '300px', overflowY: 'scroll' }}>
         {messages.map((message, index) => (
           <div key={index} style={{ textAlign: message.sender === 'bot' ? 'left' : 'right' }}>
             <strong>{message.sender === 'bot' ? 'Bot' : 'You'}:</strong> {message.text}
           </div>
         ))}
       </div>
-      <form onSubmit={sendMessage} style={{ marginTop: '10px' }}>
+
+      <ImageUltron/>
+
+      <form onSubmit={sendMessage} style={{ marginTop: '10px' , display:'flex'}}>
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Tapez votre message..."
-          style={{ width: '80%' }}
+          style={{width: '50%' }}
           disabled={isLoading}
         />
-        <button type="submit" style={{ width: '20%' }} disabled={isLoading}>
+        <button type="submit" style={{ width: '20%', display:'flex'}} disabled={isLoading}>
           {isLoading ? 'Envoi...' : 'Envoyer'}
         </button>
       </form>
