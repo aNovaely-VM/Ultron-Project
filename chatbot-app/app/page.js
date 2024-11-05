@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from 'react';
 import ImageUltron from '@/app/generationImageUltron/generationImage';
+import "./globals.css";
 
 export default function ChatBot() {
   const [messages, setMessages] = useState([]);
