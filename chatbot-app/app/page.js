@@ -1,6 +1,7 @@
 "use client";
 import { useState } from 'react';
 import ImageUltron from '@/app/generationImageUltron/generationImage';
+import "./globals.css";
 
 export default function ChatBot() {
   const [messages, setMessages] = useState([]);
@@ -40,7 +41,7 @@ export default function ChatBot() {
 
   return (
     <div style={{ padding: '20px' }}>
-      <h1 style={{textAlign: 'center'}}>Chatbot avec Cohere</h1>
+      <h1 style={{textAlign: 'center'}}>Chatbot av Cohere</h1>
       <div style={{ border: '1px solid #ccc', padding: '20px', maxHeight: '300px', overflowY: 'scroll' }}>
         {messages.map((message, index) => (
           <div key={index} style={{ textAlign: message.sender === 'bot' ? 'left' : 'right' }}>
