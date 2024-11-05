@@ -12,7 +12,7 @@ export default async function handler(req, res) {
           },
           body: JSON.stringify({
             prompt: message,
-            max_tokens: 50,
+            max_tokens: 5000,
           }),
         });
   

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from 'react';
+import { franc } from 'franc'; // Importer la bibliothèque franc pour la détection de langue
 import ImageUltron from '@/app/generationImageUltron/generationImage';
-import "./globals.css";
 
 export default function ChatBot() {
   const [messages, setMessages] = useState([]);
@@ -10,16 +10,15 @@ export default function ChatBot() {
   const messagesEndRef = useRef(null);
 
   // Fonction de synthèse vocale pour faire parler le chatbot
-  const speak = (text) => {
+  const speak = (text, languageCode) => {
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-EN'; // Définit la langue française (modifiez selon les besoins)
+    utterance.lang = languageCode === 'fra' ? 'fr-FR' : 'en-US'; // Ajustez en fonction de la langue détectée
     speechSynthesis.speak(utterance);
   };
 
   const sendMessage = async (e) => {
     e.preventDefault();
-  
-    // Vérifier si le message contient "chat" et rediriger
+
     if (input.toLowerCase().includes("chat")) {
       window.location.href = "https://pixabay.com/fr/images/search/chat/#:~:text=%2B%20de%2030%20000%20belles%20images%20de%20chats%20et%20de%20chatons%20-%20Pixabay";
       return;
@@ -28,27 +27,29 @@ export default function ChatBot() {
       window.location.href = "https://www.instagram.com/p/CbDRRDisogz/";
       return;
     }
-  
-    // Ajout du message utilisateur
+    // Détecter la langue du message utilisateur avec franc
+    const detectedLang = franc(input); // Retourne un code ISO639 (par exemple, "fra" pour le français)
+
+    // Ajouter le message utilisateur à l'interface
     setMessages((prevMessages) => [...prevMessages, { sender: 'user', text: input }]);
     setIsLoading(true);
-  
+
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ message: input, language: detectedLang }),
       });
-  
+
       const data = await response.json();
       const botMessage = data.text;
-  
-      // Ajouter la réponse de l'IA et faire parler le bot
+
+      // Ajouter la réponse de l'IA et faire parler le bot dans la langue détectée
       setMessages((prevMessages) => [...prevMessages, { sender: 'Ultron', text: botMessage }]);
-      speak(botMessage);
-  
+      speak(botMessage, detectedLang); // Faire parler dans la langue détectée
+
       setInput('');
     } catch (error) {
       console.error('Error sending message:', error);
@@ -57,7 +58,6 @@ export default function ChatBot() {
       setIsLoading(false);
     }
   };
-  
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
