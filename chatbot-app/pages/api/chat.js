@@ -12,7 +12,8 @@ export default async function handler(req, res) {
           },
           body: JSON.stringify({
             prompt: message,
-            max_tokens: 5000,
+            model:"command-r-08-2024",
+            max_tokens: 500,
           }),
         });
   
