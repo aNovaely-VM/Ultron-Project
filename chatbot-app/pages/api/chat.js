@@ -1,37 +1,30 @@
 export default async function handler(req, res) {
-    if (req.method === 'POST') {
-      const { message } = req.body;
-  
+  if (req.method === 'POST') {
+      const { prompt } = req.body;
+
       try {
-        console.log('Envoi de la requête à l\'API Cohere...');
-        const cohereResponse = await fetch('https://api.cohere.ai/generate', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.COHERE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            prompt: message,
-            model:"command-r-08-2024",
-            max_tokens: 500,
-          }),
-        });
-  
-        console.log('Réponse API Cohere reçue...');
-        const data = await cohereResponse.json();
-        console.log('Données reçues:', data);
-  
-        // Utiliser la propriété `text` directement
-        const generatedText = data.text;
-        console.log('Texte généré:', generatedText);
-        res.status(200).json({ text: generatedText.trim() });
-  
+          const cohereResponse = await fetch('https://api.cohere.ai/generate', {
+              method: 'POST',
+              headers: {
+                  'Authorization': `Bearer ${process.env.COHERE_API_KEY}`,
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                  prompt: prompt, // Le prompt complet (Ultron + historique)
+                  model: "command-r-08-2024",
+                  max_tokens: 500,
+              }),
+          });
+
+          const data = await cohereResponse.json();
+          const generatedText = data.text;
+
+          res.status(200).json({ text: generatedText.trim() });
       } catch (error) {
-        console.error('Erreur lors de l\'appel API:', error);
-        res.status(500).json({ error: 'Failed to generate text' });
+          console.error('Erreur lors de l\'appel API:', error);
+          res.status(500).json({ error: 'Failed to generate text' });
       }
-    } else {
+  } else {
       res.status(405).json({ error: 'Method not allowed' });
-    }
   }
-  
+}

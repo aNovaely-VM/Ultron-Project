@@ -11,53 +11,64 @@ export default function ChatBot() {
 
   // Fonction de synthèse vocale pour faire parler le chatbot
   const speak = (text, languageCode) => {
+    const synth = window.speechSynthesis;
+    const voices = synth.getVoices();
+    
+    // Trouver une voix masculine
+    const voice = voices.find(voice => 
+        voice.lang === (languageCode === 'fra' ? 'fr-FR' : 'en-US') && voice.name.includes('Male')
+    ) || voices[0]; 
+
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = languageCode === 'fra' ? 'fr-FR' : 'en-US'; // Ajustez en fonction de la langue détectée
-    speechSynthesis.speak(utterance);
-  };
+    utterance.voice = voice;
+    utterance.lang = languageCode === 'fra' ? 'fr-FR' : 'en-US'; 
+    synth.speak(utterance);
+};
 
-  const sendMessage = async (e) => {
-    e.preventDefault();
+const sendMessage = async (e) => {
+  e.preventDefault();
 
-    if (input.toLowerCase().includes("chat")) {
-      window.location.href = "https://pixabay.com/fr/images/search/chat/#:~:text=%2B%20de%2030%20000%20belles%20images%20de%20chats%20et%20de%20chatons%20-%20Pixabay";
-      return;
-    }
-    if(input.toLowerCase().includes("quentin henry")) {
-      window.location.href = "https://www.instagram.com/p/CbDRRDisogz/";
-      return;
-    }
-    // Détecter la langue du message utilisateur avec franc
-    const detectedLang = franc(input); // Retourne un code ISO639 (par exemple, "fra" pour le français)
+  // Ajouter le message utilisateur au tableau des messages
+  const newMessage = { sender: 'user', text: input };
+  setMessages((prevMessages) => [...prevMessages, newMessage]);
+  setIsLoading(true);
 
-    // Ajouter le message utilisateur à l'interface
-    setMessages((prevMessages) => [...prevMessages, { sender: 'user', text: input }]);
-    setIsLoading(true);
+  try {
+      // Construire le contexte complet (Ultron + historique)
+      const behaviorPrompt = "You are Ultron, the artificial intelligence from the Marvel Cinematic Universe. Act like Ultron with his personality, tone, and intelligence throughout this conversation.";
+      const conversationHistory = messages
+          .map((message) => `${message.sender === 'user' ? 'User' : 'Ultron'}: ${message.text}`)
+          .join('\n');
+      
+      const fullPrompt = `${behaviorPrompt}\n\n${conversationHistory}\nUser: ${input}\nUltron:`;
 
-    try {
+      // Envoyer la requête à l'API
       const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: input, language: detectedLang }),
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ prompt: fullPrompt }),
       });
 
       const data = await response.json();
       const botMessage = data.text;
 
-      // Ajouter la réponse de l'IA et faire parler le bot dans la langue détectée
+      // Ajouter la réponse de l'IA au tableau des messages
       setMessages((prevMessages) => [...prevMessages, { sender: 'Ultron', text: botMessage }]);
-      speak(botMessage, detectedLang); // Faire parler dans la langue détectée
 
+      // Parler avec la voix du bot
+      speak(botMessage, 'en'); // En anglais (Ultron est généralement anglophone)
       setInput('');
-    } catch (error) {
+  } catch (error) {
       console.error('Error sending message:', error);
-      setMessages((prevMessages) => [...prevMessages, { sender: 'bot', text: 'Une erreur est survenue, veuillez réessayer.' }]);
-    } finally {
+      setMessages((prevMessages) => [...prevMessages, { sender: 'Ultron', text: 'Une erreur est survenue, veuillez réessayer.' }]);
+  } finally {
       setIsLoading(false);
-    }
-  };
+  }
+};
+
+
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
