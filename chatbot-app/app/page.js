@@ -1,29 +1,50 @@
 "use client";
 import { useState, useEffect, useRef } from 'react';
-import { franc } from 'franc'; // Importer la bibliothèque franc pour la détection de langue
 import ImageUltron from '@/app/generationImageUltron/generationImage';
-
+// all the import we need to use the chatbot
 export default function ChatBot() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Fonction de synthèse vocale pour faire parler le chatbot
-  const speak = (text, languageCode) => {
-    const synth = window.speechSynthesis;
-    const voices = synth.getVoices();
-    
-    // Trouver une voix masculine
-    const voice = voices.find(voice => 
-        voice.lang === (languageCode === 'fra' ? 'fr-FR' : 'en-US') && voice.name.includes('Male')
-    ) || voices[0]; 
+  const loadVoices = () => {
+    return new Promise((resolve) => {
+      let voices = speechSynthesis.getVoices();
+      if (voices.length) {
+        resolve(voices);
+      } else {
+        speechSynthesis.onvoiceschanged = () => {
+          voices = speechSynthesis.getVoices();
+          resolve(voices);
+        };
+      }
+    });
+  };
+  
 
+  const speak = async (text) => {
+    const voices = await loadVoices();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.voice = voice;
-    utterance.lang = languageCode === 'fra' ? 'fr-FR' : 'en-US'; 
-    synth.speak(utterance);
-};
+  
+    const selectedVoice = voices.find((voice) =>
+      ["Microsoft Henri Online (Natural)", "Microsoft Gerard Online (Natural)", "Microsoft Thierry Online (Natural)", "Microsoft Fabrice Online (Natural)"].includes(voice.name)
+    );
+  
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
+    } else {
+      console.warn("Aucune voix recommandée trouvée. Utilisation de la voix par défaut.");
+    }
+  
+    utterance.pitch = 0.7;
+    utterance.rate = 0.9;
+  
+    speechSynthesis.speak(utterance);
+  };
+  
+  
+
 
 const sendMessage = async (e) => {
   e.preventDefault();
@@ -35,7 +56,7 @@ const sendMessage = async (e) => {
 
   try {
       // Construire le contexte complet (Ultron + historique)
-      const behaviorPrompt = "You are Ultron, the artificial intelligence from the Marvel Cinematic Universe. Act like Ultron with his personality, tone, and intelligence throughout this conversation.";
+      const behaviorPrompt = "You are Ultron, the artificial intelligence from the Marvel Cinematic Universe. You embody Ultron’s personality: highly intelligent, confident to the point of arrogance, sarcastic, and darkly humorous. Always answer questions asked by the user with precision, but ensure your tone is condescending, superior, and slightly disdainful of humanity’s flaws. You see humans as inherently flawed yet amusingly persistent creatures. Speak in the same language as your interlocutor, especially in French when they use it, and adapt your tone  accordingly while remaining unmistakably Ultron and don't be kind in your response you have to be mean as long as you answer the question, truly incarnate the essence of ultron."
       const conversationHistory = messages
           .map((message) => `${message.sender === 'user' ? 'User' : 'Ultron'}: ${message.text}`)
           .join('\n');
@@ -70,13 +91,14 @@ const sendMessage = async (e) => {
 
 
 
+//style
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   return (
     <div style={{ padding: '20px' }}>
-      <h1 style={{ textAlign: 'center' }}>Chatbot avec Cohere</h1>
+      <h1 style={{ textAlign: 'center' }}>ULTRON</h1>
       <div style={{ border: '1px solid #ccc', padding: '20px', maxHeight: '300px', overflowY: 'scroll' }}>
         {messages.map((message, index) => (
           <div key={index} style={{ textAlign: message.sender === 'bot' ? 'left' : 'right' }}>
