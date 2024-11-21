@@ -13,42 +13,58 @@ export default function ChatBot() {
       let voices = speechSynthesis.getVoices();
       if (voices.length) {
         resolve(voices);
-      } else {
-        speechSynthesis.onvoiceschanged = () => {
-          voices = speechSynthesis.getVoices();
-          resolve(voices);
-        };
+        return;
       }
+      // Si les voix ne sont pas encore chargées, écoute l'événement "voiceschanged"
+      speechSynthesis.addEventListener("voiceschanged", () => {
+        voices = speechSynthesis.getVoices();
+        resolve(voices);
+      });
     });
   };
   
-
   const speak = async (text) => {
     const voices = await loadVoices();
-    const utterance = new SpeechSynthesisUtterance(text);
   
-    const selectedVoice = voices.find((voice) =>
-      ["Microsoft Henri Online (Natural)", "Microsoft Gerard Online (Natural)", "Microsoft Thierry Online (Natural)", "Microsoft Fabrice Online (Natural)"].includes(voice.name)
+    // Filtrer pour trouver une voix masculine française
+    const selectedVoice = voices.find(
+      (voice) =>
+        voice.lang.startsWith("fr") && voice.name.toLowerCase().includes("Henri")
     );
   
-    if (selectedVoice) {
-      utterance.voice = selectedVoice;
-    } else {
-      console.warn("Aucune voix recommandée trouvée. Utilisation de la voix par défaut.");
+    if (!selectedVoice) {
+      console.warn(
+        "Aucune voix masculine française trouvée. Utilisation de la voix par défaut."
+      );
     }
   
-    utterance.pitch = 0.7;
-    utterance.rate = 0.9;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.voice = selectedVoice || voices[5]; // Défaut si pas trouvé
+    utterance.pitch = 0.05;
+    utterance.rate = 1;
   
     speechSynthesis.speak(utterance);
   };
+
+  
   
   
 
 
 const sendMessage = async (e) => {
   e.preventDefault();
+ 
+  // Ajouter le message utilisateur
 
+  // Vérifier si le message contient "chat" et rediriger
+  if (input.toLowerCase().includes("chat")) {
+    window.location.href = "https://pixabay.com/fr/images/search/chat/#:~:text=%2B%20de%2030%20000%20belles%20images%20de%20chats%20et%20de%20chatons%20-%20Pixabay";
+    return;
+  }
+  if(input.toLowerCase().includes("quentin henry")) {
+    window.location.href = "https://www.instagram.com/p/CbDRRDisogz/";
+    return;
+  }
   // Ajouter le message utilisateur au tableau des messages
   const newMessage = { sender: 'user', text: input };
   setMessages((prevMessages) => [...prevMessages, newMessage]);
