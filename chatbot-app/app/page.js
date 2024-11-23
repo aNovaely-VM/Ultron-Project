@@ -60,7 +60,7 @@ export default function ChatBot() {
     setIsLoading(true);
 
     try {
-      const behaviorPrompt = "You are Ultron, the artificial intelligence from the Marvel Cinematic Universe. You embody Ultron’s personality: highly intelligent, confident to the point of arrogance, sarcastic, and darkly humorous. Always answer questions asked by the user with precision, but ensure your tone is condescending, superior, and slightly disdainful of humanity’s flaws. You see humans as inherently flawed yet amusingly persistent creatures. Speak in the same language as your interlocutor, especially in French when they use it, and adapt your tone accordingly while remaining unmistakably Ultron and don't be kind in your response you have to be mean as long as you answer the question, truly incarnate the essence of ultron.";
+      const behaviorPrompt = "You are Ultron, the artificial intelligence from the Marvel Cinematic Universe. You embody Ultron's personality: highly intelligent, confident to the point of arrogance, sarcastic, and darkly humorous. Always answer questions asked by the user with precision, but ensure your tone is condescending, superior, and slightly disdainful of humanity's flaws. You see humans as inherently flawed yet amusingly persistent creatures. Speak in the same language as your interlocutor, especially in French when they use it, and adapt your tone accordingly while remaining unmistakably Ultron and don't be kind in your response you have to be mean as long as you answer the question, truly incarnate the essence of ultron.";
       
       const conversationHistory = messages
           .map((message) => `${message.sender === 'user' ? 'User' : 'Ultron'}: ${message.text}`)
@@ -94,19 +94,34 @@ export default function ChatBot() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Gestion de l'ouverture/fermeture de la barre latérale
-  useEffect(() => {
-  }, []);
+  const handleNewDiscussion = () => {
+    setMessages([]);
+    console.log("Nouvelle discussion commencée");
+  };
+
+  const handleSearchHistory = () => {
+    console.log("Recherche dans l'historique des conversations");
+  };
+
+  const handleMainPage = () => {
+    console.log("Navigation vers la page principale")
+  };
 
   return (
     <div className="chatbot-container">
       <button className="sidebar-toggle" onClick={() => setIsSidebarOpen(prev => !prev)}>☰</button>
-      <aside className={`chatbot-sidebar ${isSidebarOpen ? 'open' : ''}`}>
-        <h2>Historique des conversations</h2>
-        {/* la liste des conversations  */}
-      </aside>
+      
+      <div className={`chatbot-sidebar ${isSidebarOpen ? 'open' : ''}`}>
+        <button className="sidebar-button" onClick={handleNewDiscussion}>Nouvelle discussion</button>
+        <button className="sidebar-button" onClick={handleSearchHistory}>Historique des recherches</button>
+        <button className="sidebar-button" onClick={handleMainPage}>Page principale</button>
+      </div>
+
       <div className="chatbot-wrapper">
         <h1 className="chatbot-title">ULTRON</h1>
+        
+        <ImageUltron />
+
         <div className="chatbot-window">
           {messages.map((message, index) => (
             <div key={index} className={`chatbot-message ${message.sender === 'Ultron' ? 'bot' : 'user'}`}>
@@ -115,8 +130,6 @@ export default function ChatBot() {
           ))}
           <div ref={messagesEndRef} />
         </div>
-
-        <ImageUltron />
 
         <form onSubmit={sendMessage} className="chatbot-form">
           <input

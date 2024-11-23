@@ -16,20 +16,27 @@ export default function ImageUltron() {
     useEffect(() => {
         const intervalId = setInterval(() => {
             setImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-        }, 500); // Changer d'image toutes les 0.1 secondes
+        }, 500); 
 
-        return () => clearInterval(intervalId); // Nettoyage à la désinstallation
+        return () => clearInterval(intervalId); 
     }, []);
 
     return (
-        <div style={{paddingTop: '10%', display:'flex'}}>
+        <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '140px',
+            marginTop: '10px', 
+        }}>
             {images[imageIndex] && (
                 <Image
                     src={images[imageIndex]}
                     alt="Image changeante"
                     width={180}
                     height={140}
-                    onError={() => setImageIndex((prevIndex) => (prevIndex + 1) % images.length)}// Passer à l'image suivante si erreur
+                    style={{ objectFit: 'contain', marginBottom: '10px' }} 
+                    onError={() => setImageIndex((prevIndex) => (prevIndex + 1) % images.length)}
                 />
             )}
         </div>
