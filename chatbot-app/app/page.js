@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from 'react';
 import ImageUltron from '@/app/generationImageUltron/generationImage';
-import './ChatBot.css'; // Assurez-vous que le chemin est correct
+import './ChatBot.css'; 
 
 export default function ChatBot() {
   const [messages, setMessages] = useState([]);
@@ -96,7 +96,6 @@ export default function ChatBot() {
 
   // Gestion de l'ouverture/fermeture de la barre latérale
   useEffect(() => {
-    // Aucune action nécessaire ici car l'état est géré par React
   }, []);
 
   return (
@@ -104,7 +103,7 @@ export default function ChatBot() {
       <button className="sidebar-toggle" onClick={() => setIsSidebarOpen(prev => !prev)}>☰</button>
       <aside className={`chatbot-sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <h2>Historique des conversations</h2>
-        {/* Ajoutez ici la liste des conversations précédentes si nécessaire */}
+        {/* la liste des conversations  */}
       </aside>
       <div className="chatbot-wrapper">
         <h1 className="chatbot-title">ULTRON</h1>
