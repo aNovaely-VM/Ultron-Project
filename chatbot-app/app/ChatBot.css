@@ -207,6 +207,27 @@ input:hover, input:focus{
   transition: background-color 0.2s ease, transform 0.2s ease; 
 }
 
+.chatbot-window {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-bottom: 20px; 
+  padding-right: 15px; 
+  background: repeating-linear-gradient(
+      0deg, 
+      rgba(255, 255, 255, 0.1), 
+      rgba(255, 255, 255, 0.1) 2px, 
+      rgba(38, 38, 38, 0.3) 2px, 
+      rgba(38, 38, 38, 0.3) 7px 
+  ),
+  repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.1), 
+      rgba(255, 255, 255, 0.1) 2px, 
+      rgba(38, 38, 38, 0.3) 2px, 
+      rgba(38, 38, 38, 0.3) 20px
+  ); 
+}
+
 .attach-file:hover {
   background-color: #ffbb00; 
   transform: scale(1.05); 
