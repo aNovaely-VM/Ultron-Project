@@ -10,6 +10,8 @@ export default function ChatBot() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
+    // const defaultImage = '/ImageBlablaUltron2d/Ultron_vide.png'; // Image par défaut
+    // const [currentImage, setCurrentImage] = useState(defaultImage);
 
     const loadVoices = () => {
         return new Promise((resolve) => {
@@ -24,6 +26,8 @@ export default function ChatBot() {
             });
         });
     };
+
+    // const [isSpeaking, setIsSpeaking] = useState(false);
 
     // const speak = async (text) => {
     //     const cleanText = text.replace(/\[.*?\]/g, '').trim();
@@ -42,32 +46,132 @@ export default function ChatBot() {
     //     utterance.pitch = 0.05;
     //     utterance.rate = 1;
 
+    //     setIsSpeaking(true); // Activer l'animation
+    //     utterance.onend = () => setIsSpeaking(false); // Désactiver à la fin de la parole
+
     //     speechSynthesis.speak(utterance);
     // };
+
     const [isSpeaking, setIsSpeaking] = useState(false);
+    const [currentLetter, setCurrentLetter] = useState('');
+
+    // const speak = async (text) => {
+    //     const cleanText = text.replace(/\[.*?\]/g, '').trim();
+
+    //     const voices = await loadVoices();
+    //     const selectedVoice = voices.find(
+    //         (voice) => voice.lang.startsWith("fr") && voice.name.toLowerCase().includes("Henri")
+    //     );
+
+    //     const utterance = new SpeechSynthesisUtterance(cleanText);
+    //     utterance.voice = selectedVoice || voices[5];
+    //     utterance.pitch = 0.05;
+    //     utterance.rate = 1;
+
+    //     setIsSpeaking(true); // Le bot commence à parler
+
+    //     utterance.onboundary = (event) => {
+    //         const char = cleanText[event.charIndex] || '';
+    //         if (char.match(/[a-zA-Z]/)) {
+    //             setCurrentLetter(char.toUpperCase());
+    //         } else {
+    //             setCurrentLetter('');
+    //         }
+    //     };
+
+    //     utterance.onend = () => {
+    //         setIsSpeaking(false); // Le bot arrête de parler
+    //         setCurrentLetter(''); // Réinitialise la lettre
+    //     };
+
+    //     speechSynthesis.speak(utterance);
+    // };
+
+
+
+    // const speak = async (text) => {
+    //     const cleanText = text.replace(/\[.*?\]/g, '').trim();
+
+    //     const voices = await loadVoices();
+    //     const selectedVoice = voices.find(
+    //         (voice) => voice.lang.startsWith("fr") && voice.name.toLowerCase().includes("Henri")
+    //     );
+
+    //     const utterance = new SpeechSynthesisUtterance(cleanText);
+    //     utterance.voice = selectedVoice || voices[5];
+    //     utterance.pitch = 0.05;
+    //     utterance.rate = 1;
+
+    //     setIsSpeaking(true); // Le bot commence à parler
+
+    //     // Utilisation d'une autre méthode pour émettre la lettre au fur et à mesure
+    //     let charIndex = 0;  // Index de la lettre
+
+    //     utterance.onboundary = () => {
+    //         console.log("onboundaary");
+    //         const char = cleanText[charIndex] || '';  // On prend la lettre à l'index actuel
+    //         if (char.match(/[a-zA-Z]/)) {
+    //             setCurrentLetter(char.toUpperCase()); // Mise à jour de currentLetter
+    //             console.log("speek");
+    //         }
+    //         charIndex += 1;
+    //     };
+
+    //     utterance.onend = () => {
+    //         setIsSpeaking(false); // Le bot arrête de parler
+    //         setCurrentLetter('');  // Réinitialisation de la lettre
+    //     };
+
+    //     speechSynthesis.speak(utterance);
+    // };
+
+
 
     const speak = async (text) => {
         const cleanText = text.replace(/\[.*?\]/g, '').trim();
-
+    
         const voices = await loadVoices();
         const selectedVoice = voices.find(
-            (voice) => voice.lang.startsWith("fr") && voice.name.toLowerCase().includes("Henri")
+            (voice) => voice.lang.startsWith("fr") && voice.name.toLowerCase().includes("henri")
         );
-
-        if (!selectedVoice) {
-            console.warn("Aucune voix masculine française trouvée. Utilisation de la voix par défaut.");
-        }
-
+    
         const utterance = new SpeechSynthesisUtterance(cleanText);
         utterance.voice = selectedVoice || voices[5];
         utterance.pitch = 0.05;
         utterance.rate = 1;
-
-        setIsSpeaking(true); // Activer l'animation
-        utterance.onend = () => setIsSpeaking(false); // Désactiver à la fin de la parole
-
+    
+        setIsSpeaking(true); // Le bot commence à parler
+        let charIndex = 0;
+    
+        // Fonction pour simuler le suivi des lettres
+        const simulateBoundary = setInterval(() => {
+            const char = cleanText[charIndex] || '';
+            if (char.match(/[a-zA-Z]/)) {
+                setCurrentLetter(char.toUpperCase());
+                console.log('Current char:', char);
+            }
+            charIndex += 1;
+    
+            // Arrêter le simulateur si tout le texte est parcouru
+            if (charIndex >= cleanText.length) {
+                clearInterval(simulateBoundary);
+                setIsSpeaking(false);
+                setCurrentLetter('');
+            }
+        }, 200); // Ajustez la durée pour synchroniser avec la parole
+    
+        utterance.onend = () => {
+            clearInterval(simulateBoundary); // Assurez-vous d'arrêter le simulateur
+            setIsSpeaking(false);
+            setCurrentLetter('');
+        };
+    
+        // Démarrage de la synthèse vocale
         speechSynthesis.speak(utterance);
     };
+    
+    
+
 
 
     const sendMessage = async (e) => {
@@ -167,7 +271,7 @@ export default function ChatBot() {
             <main className="main-content">
                 <h1 className="title">ULTRON</h1>
                 {/* <ImageUltron /> */}
-                <ImageUltron isSpeaking={isSpeaking} />
+                <ImageUltron isSpeaking={isSpeaking} currentLetter={currentLetter} />
                 <div className="chatbot-window">
                     {messages.map((message, index) => (
                         <div key={index} className={`message ${message.sender === 'Ultron' ? 'ultron' : 'user'}`}>
