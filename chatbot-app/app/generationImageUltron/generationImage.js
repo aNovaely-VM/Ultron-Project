@@ -109,6 +109,7 @@ export default function ImageUltron({ isSpeaking, currentLetter }) {
                 alignItems: 'center',
                 height: '140px',
                 marginTop: '10px',
+                // borderRadius : '10%'
             }}
         >
             <Image
@@ -116,7 +117,7 @@ export default function ImageUltron({ isSpeaking, currentLetter }) {
                 alt="Image synchronisée"
                 width={180}
                 height={140}
-                style={{ objectFit: 'contain', marginBottom: '10px' }}
+                style={{ objectFit: 'contain', marginBottom: '10px' , borderRadius : '30%'}}
             />
         </div>
     );
