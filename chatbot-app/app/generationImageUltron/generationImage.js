@@ -65,11 +65,21 @@ import Image from 'next/image';
 
 export default function ImageUltron({ isSpeaking, currentLetter }) {
     const letterToImageMap = {
-        A: '/ImageBlablaUltron2d/Ultron_A.png',
-        // E: '/ImageBlablaUltron2d/Ultron_E.png',
-        I: '/ImageBlablaUltron2d/Ultron_I.png',
+        A: '/ImageBlablaUltron2d/Ultron_A,E,I.png',
+        B: '/ImageBlablaUltron2d/Ultron_B;M;P.png',
+        M: '/ImageBlablaUltron2d/Ultron_B;M;P.png',
+        P: '/ImageBlablaUltron2d/Ultron_B;M;P.png',
+        F: '/ImageBlablaUltron2d/Ultron_f,v.png',
+        V: '/ImageBlablaUltron2d/Ultron_f,v.png',
+        L: '/ImageBlablaUltron2d/Ultron_L.png',
+        R: '/ImageBlablaUltron2d/Ultron_r.png',
+        W: '/ImageBlablaUltron2d/w,q.png',
+        Q: '/ImageBlablaUltron2d/w,q.png',
+        J: '/ImageBlablaUltron2d/Ultron_ch,j,sh.png',
+        E: '/ImageBlablaUltron2d/Ultron_A,E,I.png',
+        I: '/ImageBlablaUltron2d/Ultron_A,E,I.png',
         O: '/ImageBlablaUltron2d/Ultron_O.png',
-        // U: '/ImageBlablaUltron2d/Ultron_U.png',
+        U: '/ImageBlablaUltron2d/Ultron_U.png',
     };
 
     const randomImages = [
@@ -78,7 +88,7 @@ export default function ImageUltron({ isSpeaking, currentLetter }) {
         '/ImageBlablaUltron2d/Ultron_vide.png',
     ];
 
-    const defaultImage = '/ImageBlablaUltron2d/Ultron_vide.png'; // Image par défaut
+    const defaultImage = '/ImageBlablaUltron2d/Ultron_defaut.png'; // Image par défaut
     const [currentImage, setCurrentImage] = useState(defaultImage);
 
     useEffect(() => {
