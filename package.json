@@ -1,5 +1,16 @@
 {
   "dependencies": {
     "franc": "^6.2.0"
-  }
+  },
+  "name": "ultron-project",
+  "version": "1.0.0",
+  "description": "ok",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "keywords": []
 }
