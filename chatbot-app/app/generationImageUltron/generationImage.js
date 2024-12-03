@@ -26,7 +26,7 @@ export default function ImageUltron({ isSpeaking, currentLetter }) {
         '/ImageBlablaUltron2d/Ultron_vide.png',
     ];
 
-    const defaultImage = '/ImageBlablaUltron2d/Ultron_defaut.png'; // Image par défaut
+    const defaultImage = '/ImageBlablaUltron2d/Ultron_vide.png'; // Image par défaut
     const [currentImage, setCurrentImage] = useState(defaultImage);
 
     useEffect(() => {
