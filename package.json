@@ -1,8 +1,16 @@
 {
   "dependencies": {
-    "@react-three/drei": "^9.117.3",
-    "@react-three/fiber": "^8.17.10",
-    "franc": "^6.2.0",
-    "three": "^0.170.0"
-  }
+    "franc": "^6.2.0"
+  },
+  "name": "ultron-project",
+  "version": "1.0.0",
+  "description": "ok",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "keywords": []
 }

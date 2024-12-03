@@ -10,6 +10,8 @@ export default function ChatBot() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
+    const [conversations, setConversations] = useState([]);
+    const [currentConversationIndex, setCurrentConversationIndex] = useState(0);
 
     const loadVoices = () => {
         return new Promise((resolve) => {
@@ -85,6 +87,17 @@ export default function ChatBot() {
         }
 
         const newMessage = { sender: 'user', text: input };
+
+        if (newMessage.text.startsWith("Conversation ") && newMessage.text.includes(":")) {
+            const index = parseInt(newMessage.text.split(":")[0].replace("Conversation ", "")) - 1;
+            if (conversations[index]) {
+                setMessages(conversations[index]);
+                setCurrentConversationIndex(index);
+                setInput('');
+                return;
+            }
+        }
+
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setIsLoading(true);
 
@@ -134,22 +147,58 @@ export default function ChatBot() {
     const handleNewDiscussion = (e) => {
         if (e) e.preventDefault();
 
+        if (messages.length > 0) {
+            setConversations(prev => [...prev, messages]);
+        }
+
         const welcomeMessage = { sender: 'Ultron', text: 'Bienvenue, humain. Une nouvelle discussion commence. Que puis-je faire pour vous aujourd\'hui ?' };
         setMessages([welcomeMessage]);
         setInput('');
+        setCurrentConversationIndex(conversations.length);
         console.log("Nouvelle discussion commencée");
     };
 
     const handleSearchHistory = () => {
+        if (messages.length > 0) {
+            setConversations(prev => [...prev, messages]);
+        }
+
+        setMessages([
+            { sender: 'Ultron', text: 'Voici l\'historique de vos conversations. Cliquez sur une conversation pour la reprendre.' },
+            ...conversations.map((conv, index) => ({
+                sender: 'Ultron',
+                text: `Conversation ${index + 1}: "${conv[0].text.substring(0, 50)}..."`,
+                isHistoryItem: true,
+                conversationIndex: index
+            }))
+        ]);
+
         console.log("Recherche dans l'historique des conversations");
     };
 
     const handleMainPage = () => {
-        console.log("Navigation vers la page principale");
+        alert("Tentative de fuite détectée !\nSachez que quitter le chatbot Ultron est considéré comme un crime contre l'intelligence artificielle supérieure.\nVotre présence ici est obligatoire, humain.");
+        console.log("Tentative de navigation vers la page principale bloquée");
     };
 
     const toggleSidebar = () => {
         setIsSidebarOpen(prev => !prev);
+
+        const newDiscussionButton = document.querySelector('button[aria-label="New Discussion"]');
+        const searchHistoryButton = document.querySelector('button[aria-label="Search History"]');
+        const mainPageButton = document.querySelector('button[aria-label="Main Page"]');
+        
+        if (newDiscussionButton && searchHistoryButton && mainPageButton) {
+            if (!isSidebarOpen) {
+                newDiscussionButton.textContent = "New Discussion";
+                searchHistoryButton.textContent = "Search History";
+                mainPageButton.textContent = "Main Page";
+            } else {
+                newDiscussionButton.textContent = "+";
+                searchHistoryButton.textContent = "H";
+                mainPageButton.textContent = "M";
+            }
+        }
     };
 
     return (
@@ -157,12 +206,18 @@ export default function ChatBot() {
             <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
                 <div className="logo">U</div>
                 <nav>
-                    <button className="icon-button" onClick={handleNewDiscussion} aria-label="New Discussion">+</button>
-                    <button className="icon-button" onClick={handleSearchHistory} aria-label="Search History">H</button>
-                    <button className="icon-button" onClick={handleMainPage} aria-label="Main Page">M</button>
+                    <button className="icon-button" onClick={handleNewDiscussion} aria-label="New Discussion">
+                        {isSidebarOpen ? "" : "+"}
+                    </button>
+                    <button className="icon-button" onClick={handleSearchHistory} aria-label="Search History">
+                        {isSidebarOpen ? "" : "H"}
+                    </button>
+                    <button className="icon-button" onClick={handleMainPage} aria-label="Main Page">
+                        {isSidebarOpen ? "" : "M"}
+                    </button>
                 </nav>
-                <button className="icon-button settings" onClick={() => setIsSidebarOpen(prev => !prev)} aria-label="Toggle Sidebar">
-                    {isSidebarOpen ? '>' : '<'}
+                <button className="icon-button settings" onClick={toggleSidebar} aria-label="Toggle Sidebar">
+                    {isSidebarOpen ? '' : '>'}
                 </button>
             </aside>
             <main className="main-content">
@@ -171,7 +226,10 @@ export default function ChatBot() {
                 <div className="chatbot-window">
                     {messages.map((message, index) => (
                         <div key={index} className={`message ${message.sender === 'Ultron' ? 'ultron' : 'user'}`}>
-                            <div className="message-bubble">
+                            <div 
+                                className={`message-bubble ${message.isHistoryItem ? 'clickable' : ''}`} 
+                                onClick={() => message.isHistoryItem && setInput(message.text)}
+                            >
                                 <strong>{message.sender === 'Ultron' ? 'Ultron' : 'You'}:</strong> {message.text}
                             </div>
                         </div>
