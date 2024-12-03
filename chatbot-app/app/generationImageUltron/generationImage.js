@@ -75,7 +75,7 @@ export default function ImageUltron({ isSpeaking, currentLetter }) {
         R: '/ImageBlablaUltron2d/Ultron_r-removebg-preview.png',
         W: '/ImageBlablaUltron2d/w_q-removebg-preview.png',
         Q: '/ImageBlablaUltron2d/w_q-removebg-preview.png',
-        J: '/ImageBlablaUltron2d/Ultron_ch,j,sh.png',
+        J: '/ImageBlablaUltron2d/Ultron_ch_j_sh-removebg-preview.png',
         E: '/ImageBlablaUltron2d/Ultron_A_E_I-removebg-preview.png',
         I: '/ImageBlablaUltron2d/Ultron_A_E_I-removebg-preview.png',
         O: '/ImageBlablaUltron2d/Ultron_O-removebg-preview.png',
