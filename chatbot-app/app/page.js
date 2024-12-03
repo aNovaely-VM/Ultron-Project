@@ -159,21 +159,40 @@ export default function ChatBot() {
     };
 
     const handleSearchHistory = () => {
-        if (messages.length > 0) {
+        if (messages.length > 0 && !messages[messages.length - 1].isHistoryItem) {
             setConversations(prev => [...prev, messages]);
         }
-
+    
+        const historyMessages = conversations
+        .map((conv, index) => {
+            const firstUserMessage = conv.find(message => message.sender === 'user');
+            
+            if (firstUserMessage) {
+                return {
+                    sender: 'Ultron',
+                    text: `Conversation ${index + 1}: "${firstUserMessage.text.substring(0, 50)}${firstUserMessage.text.length > 50 ? '...' : ''}"`,
+                    isHistoryItem: true,
+                    conversationIndex: index
+                };
+            }
+            return null;
+        })
+        .filter(message => message !== null);
+    
         setMessages([
             { sender: 'Ultron', text: 'Voici l\'historique de vos conversations. Cliquez sur une conversation pour la reprendre.' },
-            ...conversations.map((conv, index) => ({
-                sender: 'Ultron',
-                text: `Conversation ${index + 1}: "${conv[0].text.substring(0, 50)}..."`,
-                isHistoryItem: true,
-                conversationIndex: index
-            }))
+            ...historyMessages
         ]);
+    
+        console.log("Affichage de l'historique des conversations");
+    };
 
-        console.log("Recherche dans l'historique des conversations");
+    const handleConversationClick = (index) => {
+        if (conversations[index]) {
+            setMessages(conversations[index]);
+            setCurrentConversationIndex(index);
+            console.log(`Conversation ${index + 1} chargée`);
+        }
     };
 
     const handleMainPage = () => {
@@ -228,7 +247,7 @@ export default function ChatBot() {
                         <div key={index} className={`message ${message.sender === 'Ultron' ? 'ultron' : 'user'}`}>
                             <div 
                                 className={`message-bubble ${message.isHistoryItem ? 'clickable' : ''}`} 
-                                onClick={() => message.isHistoryItem && setInput(message.text)}
+                                onClick={() => message.isHistoryItem && handleConversationClick(message.conversationIndex)}
                             >
                                 <strong>{message.sender === 'Ultron' ? 'Ultron' : 'You'}:</strong> {message.text}
                             </div>

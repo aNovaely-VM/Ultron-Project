@@ -50,6 +50,7 @@ body, html {
 
 .sidebar.open .icon-button {
   width: 100%;
+  text-align: center;
   justify-content: flex-start;
   padding: 10px;
   font-size: 18px;
