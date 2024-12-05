@@ -152,7 +152,7 @@ export default function ChatBotWith3D() {
       gltfLoader.load("./assets/ultron/scene.gltf", (gltfScene) => {
 
           gltfScene.scene.rotation.y = Math.PI / 8;
-          gltfScene.scene.position.y = -10;
+          gltfScene.scene.position.y = -20;
           gltfScene.scene.scale.set(10, 10, 10);
 
 
@@ -203,46 +203,48 @@ export default function ChatBotWith3D() {
     
     
     
-      return (
-        <div className="layout">
-          <div ref={threeContainerRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
-                <canvas id="threeCanvas"></canvas>
-            </div>
-    
-          <aside className="sidebar">
+  return (
+    <div className="layout">
+        <div ref={threeContainerRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+            <canvas id="threeCanvas"></canvas>
+        </div>
+
+        <aside className="sidebar">
             <button className="icon-button" onClick={handleNewDiscussion} aria-label="New Discussion">+</button>
             <button className="icon-button" onClick={handleSearchHistory} aria-label="Search History">H</button>
             <button className="icon-button" onClick={handleMainPage} aria-label="Main Page">M</button>
-          </aside>
-    
-          <main className="main-content">
+        </aside>
+
+        <main className="main-content">
             <h1 className="title">ULTRON</h1>
             <ImageUltron isSpeaking={isSpeaking} currentLetter={currentLetter} />
             <div className="chatbot-window">
-              {messages.map((message, index) => (
-                <div key={index} className={`message ${message.sender === "Ultron" ? "ultron" : "user"}`}>
-                  <div className="message-bubble">
-                    {message.text}
-                  </div>
-                </div>
-              ))}
-              <div ref={messagesEndRef} />
+                {messages.map((message, index) => (
+                    <div key={index} className={`message ${message.sender === "Ultron" ? "ultron" : "user"}`}>
+                        <div className="message-bubble">
+                            {message.text}
+                        </div>
+                    </div>
+                ))}
+                <div ref={messagesEndRef} />
             </div>
-    
+        </main>
+
+        <div className="fixed-input-container">
             <form onSubmit={sendMessage} className="input-container">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Tapez votre message..."
-                disabled={isLoading}
-              />
-              <button type="submit" disabled={isLoading}>
-                {isLoading ? "..." : "Envoyer"}
-              </button>
+                <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Tapez votre message..."
+                    disabled={isLoading}
+                />
+                <button type="submit" disabled={isLoading}>
+                    {isLoading ? "..." : "Envoyer"}
+                </button>
             </form>
-          </main>
         </div>
-      );
+    </div>
+);
     }
     
