@@ -1,0 +1,165 @@
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 60px;
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(42, 42, 42, 0.9));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    z-index: 10;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow: hidden;
+    clip-path: polygon(0 0, 100% 0, 90% 100%, 0% 100%);
+  }
+  
+  .sidebar.open {
+    width: 200px;
+    clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%);
+  }
+  
+  .sidebar-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+  }
+  
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    margin-bottom: 20px;
+  }
+  
+  .logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 24px;
+    color: var(--ultron-red);
+    text-shadow: 0 0 10px var(--ultron-red);
+    margin-bottom: 30px;
+  }
+  
+  .toggle-btn {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 20px;
+  }
+  
+  .sidebar-nav {
+    flex-grow: 1;
+  }
+  
+  .sidebar nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .nav-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    background: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+  }
+  
+  .nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .nav-item svg {
+    font-size: 20px;
+    margin-right: 15px;
+  }
+  
+  .nav-item span {
+    display: none;
+  }
+  
+  .sidebar.open .nav-item span {
+    display: inline;
+  }
+  
+  .sidebar-footer {
+    padding: 10px 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .sidebar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--ultron-red), var(--ultron-blue));
+    opacity: 0.7;
+  }
+  
+  .icon-button {
+    width: auto;
+    height: 40px;
+    background-color: transparent;
+    color: var(--text-color);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .icon-button .icon {
+    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .icon-button .text {
+    display: none;
+    margin-left: 10px;
+  }
+  
+  .sidebar.open .icon-button .text {
+    display: inline;
+  }
+  
+  .icon-button::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--ultron-red), var(--ultron-blue));
+    transition: width 0.3s ease, left 0.3s ease;
+  }
+  
+  .icon-button:hover::after {
+    width: 100%;
+    left: 0;
+  }
+  
+  .toggle-sidebar {
+    margin-top: auto;
+    transition: transform 0.3s ease;
+  }
+  

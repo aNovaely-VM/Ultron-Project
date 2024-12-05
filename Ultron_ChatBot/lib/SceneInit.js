@@ -14,6 +14,17 @@ class SceneInit {
         this.camera.position.z = 50;
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setClearColor(0x000000, 0);
+
+        // Gestion du redimensionnement
+        window.addEventListener('resize', () => {
+            this.onWindowResize();
+        });
+    }
+
+    onWindowResize() {
+        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
     animate() {
@@ -27,11 +38,20 @@ class SceneInit {
         this.updateCallbacks.push(callback);
     }
 
+    addLights() {
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        this.scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0xffffff, 0.5);
+        pointLight.position.set(10, 10, 10);
+        this.scene.add(pointLight);
+    }
+
     dispose() {
         this.renderer.dispose();
         this.scene.clear();
+        window.removeEventListener('resize', this.onWindowResize);
     }
 }
 
 export default SceneInit;
-

@@ -2,9 +2,13 @@
 import { useState, useEffect, useRef } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import SceneInit from "./lib/SceneInit";
-import "./ChatBot.css";
-import ImageUltron from "@/app/generationImageUltron/generationImage";
+import SceneInit from "../lib/SceneInit";
+import "@/styles/ChatBot.css";
+import "@/styles/Page.module.css";
+import ChatMessages from "@/components/ChatMessages";
+import ChatInput from "@/components/ChatInput";
+import Sidebar from "@/components/Sidebar";
+import ImageUltron from "@/components/ImageUltron";
 
 export default function ChatBotWith3D() {
     const [currentTheme, setCurrentTheme] = useState(null);
@@ -27,7 +31,6 @@ export default function ChatBotWith3D() {
             setDiscussions(JSON.parse(savedDiscussions));
         }
     }, []);
-
 
     useEffect(() => {
         if (discussions.length > 0) {
@@ -53,14 +56,14 @@ export default function ChatBotWith3D() {
         const cleanText = text.replace(/\[.*?\]/g, '').trim();
         const voices = await loadVoices();
         const selectedVoice = voices.find(
-            (voice) => voice.lang.startsWith("fr") && voice.name.toLowerCase().includes("henri")
+            (voice) => voice.lang.startswith("fr") && voice.name.toLowerCase().includes("henri")
         );
         const utterance = new SpeechSynthesisUtterance(cleanText);
         utterance.voice = selectedVoice || voices[5];
         utterance.pitch = 0.05;
         utterance.rate = 1;
         setIsSpeaking(true);
-        
+
         let charIndex = 0;
         const simulateBoundary = setInterval(() => {
             const char = cleanText[charIndex] || '';
@@ -80,7 +83,7 @@ export default function ChatBotWith3D() {
             setIsSpeaking(false);
             setCurrentLetter('');
         };
-        
+
         speechSynthesis.speak(utterance);
     };
 
@@ -217,7 +220,7 @@ export default function ChatBotWith3D() {
 
         const gltfLoader = new GLTFLoader();
 
-        gltfLoader.load("./assets/ultron/scene.gltf", (gltfScene) => {
+        gltfLoader.load("/assets/ultron/scene.gltf", (gltfScene) => {
             gltfScene.scene.rotation.y = Math.PI / 8;
             gltfScene.scene.position.y = -20;
             gltfScene.scene.scale.set(10, 10, 10);
@@ -253,15 +256,14 @@ export default function ChatBotWith3D() {
             window.removeEventListener("resize", handleResize);
         };
     }, []);
-    
-  
+
     return (
         <div className="layout">
             <div ref={threeContainerRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
                 <canvas id="threeCanvas"></canvas>
             </div>
             <div className="ultron-background"></div>
-    
+
             <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
                 <div className="sidebar-content">
                     <div className="logo">U</div>
@@ -280,10 +282,10 @@ export default function ChatBotWith3D() {
                     </button>
                 </div>
             </aside>
-    
+
             <main className="main-content">
                 <ImageUltron isSpeaking={isSpeaking} currentLetter={currentLetter} />
-                
+
                 <div className="chatbot-window">
                     {showHistory ? (
                         <div className="history-view">
@@ -309,10 +311,7 @@ export default function ChatBotWith3D() {
                     ) : (
                         <div>
                             {messages.map((message, index) => (
-                                <div
-                                    key={index}
-                                    className={`message ${message.sender === 'Ultron' ? 'ultron' : 'user'}`}
-                                >
+                                <div key={index} className={`message ${message.sender === 'Ultron' ? 'ultron' : 'user'}`}>
                                     <div className="message-bubble">
                                         <strong>{message.sender === 'Ultron' ? 'Ultron' : 'You'}:</strong> {message.text}
                                     </div>
@@ -322,38 +321,23 @@ export default function ChatBotWith3D() {
                         </div>
                     )}
                 </div>
-    
-                
-    
-                <form onSubmit={sendMessage} className="input-container">
-                    <button type="button" className="attach-file" onClick={() => fileInputRef.current.click()} aria-label="Joindre un fichier">
-                        +
-                    </button>
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        style={{ display: 'none' }}
-                        onChange={handleFileChange}
-                    />
-                    <input
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder="Tapez votre message..."
-                        disabled={isLoading}
-                    />
-                    <button type="submit" className="icon-button submit" disabled={isLoading}>
-                        {isLoading ? '...' : '↑'}
-                    </button>
-                </form>
+
+                <ChatInput
+                    input={input}
+                    setInput={setInput}
+                    sendMessage={sendMessage}
+                    fileInputRef={fileInputRef}
+                    handleFileChange={handleFileChange}
+                    isLoading={isLoading}
+                    isFileAttached={isFileAttached}
+                />
             </main>
-    
+
             <div className="crt-effect"></div>
             <div className="scanline"></div>
         </div>
     );
-    
+
 }
-    
 
     
