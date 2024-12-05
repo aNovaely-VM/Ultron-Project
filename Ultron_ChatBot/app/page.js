@@ -56,14 +56,14 @@ export default function ChatBotWith3D() {
         const cleanText = text.replace(/\[.*?\]/g, '').trim();
         const voices = await loadVoices();
         const selectedVoice = voices.find(
-            (voice) => voice.lang.startswith("fr") && voice.name.toLowerCase().includes("henri")
+            (voice) => voice.lang.startsWith("fr") && voice.name.toLowerCase().includes("henri")
         );
         const utterance = new SpeechSynthesisUtterance(cleanText);
         utterance.voice = selectedVoice || voices[5];
         utterance.pitch = 0.05;
         utterance.rate = 1;
         setIsSpeaking(true);
-
+    
         let charIndex = 0;
         const simulateBoundary = setInterval(() => {
             const char = cleanText[charIndex] || '';
@@ -77,15 +77,16 @@ export default function ChatBotWith3D() {
                 setCurrentLetter('');
             }
         }, 200);
-
+    
         utterance.onend = () => {
             clearInterval(simulateBoundary);
             setIsSpeaking(false);
             setCurrentLetter('');
         };
-
+    
         speechSynthesis.speak(utterance);
     };
+    
 
     const toggleSidebar = () => {
         setIsSidebarOpen(prev => !prev);
@@ -217,45 +218,50 @@ export default function ChatBotWith3D() {
         const sceneInit = new SceneInit("threeCanvas");
         sceneInit.initialize();
         sceneInit.animate();
-
+    
         const gltfLoader = new GLTFLoader();
-
+    
         gltfLoader.load("/assets/ultron/scene.gltf", (gltfScene) => {
-            gltfScene.scene.rotation.y = Math.PI / 8;
-            gltfScene.scene.position.y = -20;
-            gltfScene.scene.scale.set(10, 10, 10);
-
+            gltfScene.scene.rotation.y = Math.PI / 16;
+            gltfScene.scene.position.y = -100;
+            gltfScene.scene.scale.set(20, 20, 20);
+    
             sceneInit.scene.add(gltfScene.scene);
-
+    
             if (gltfScene.animations && gltfScene.animations.length > 0) {
                 const mixer = new THREE.AnimationMixer(gltfScene.scene);
                 gltfScene.animations.forEach((clip) => {
                     const action = mixer.clipAction(clip);
                     action.play();
                 });
-
+    
                 sceneInit.addUpdateCallback((delta) => {
                     mixer.update(delta);
                 });
             }
-
-            const ambientLight = new THREE.AmbientLight(0x404040, 8);
+    
+            const ambientLight = new THREE.AmbientLight(0xffffff, 5);
             sceneInit.scene.add(ambientLight);
-
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-            directionalLight.position.set(0, 1, 0);
+    
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 5);
+            directionalLight.position.set(10, 10, 10);
             sceneInit.scene.add(directionalLight);
+    
+            const pointLight = new THREE.PointLight(0xffffff, 1);
+            pointLight.position.set(-10, -10, -10);
+            sceneInit.scene.add(pointLight);
         });
-
+    
         const handleResize = () => {
             sceneInit.resize();
         };
-
+    
         window.addEventListener("resize", handleResize);
         return () => {
             window.removeEventListener("resize", handleResize);
         };
     }, []);
+    
 
     return (
         <div className="layout">

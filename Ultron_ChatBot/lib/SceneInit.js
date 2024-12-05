@@ -15,13 +15,10 @@ class SceneInit {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setClearColor(0x000000, 0);
 
-        // Gestion du redimensionnement
-        window.addEventListener('resize', () => {
-            this.onWindowResize();
-        });
+        window.addEventListener('resize', this.resize.bind(this));
     }
 
-    onWindowResize() {
+    resize() {
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -50,7 +47,7 @@ class SceneInit {
     dispose() {
         this.renderer.dispose();
         this.scene.clear();
-        window.removeEventListener('resize', this.onWindowResize);
+        window.removeEventListener('resize', this.resize.bind(this));
     }
 }
 
