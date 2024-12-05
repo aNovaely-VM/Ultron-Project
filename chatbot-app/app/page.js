@@ -17,6 +17,8 @@ export default function ChatBotWith3D() {
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
     const threeContainerRef = useRef(null); 
+    const [conversations, setConversations] = useState([]);
+    const [currentConversationIndex, setCurrentConversationIndex] = useState(0);
 
     const loadVoices = () => {
         return new Promise((resolve) => {
@@ -79,14 +81,29 @@ export default function ChatBotWith3D() {
             window.location.href = "https://www.instagram.com/p/CbDRRDisogz/";
             return;
         }
+        if (input.toLowerCase().includes("would you lose")) {
+            window.location.href = "https://www.deviantart.com/lanaismar4/art/Nah-I-d-win-1054712475";
+            return;
+        }
 
         const newMessage = { sender: "user", text: input };
+
+        if (newMessage.text.startsWith("Conversation ") && newMessage.text.includes(":")) {
+            const index = parseInt(newMessage.text.split(":")[0].replace("Conversation ", "")) - 1;
+            if (conversations[index]) {
+                setMessages(conversations[index]);
+                setCurrentConversationIndex(index);
+                setInput('');
+                return;
+            }
+        }
+
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setIsLoading(true);
 
         try {
-            const behaviorPrompt = "You are Ultron, the artificial intelligence from the Marvel Cinematic Universe. You embody Ultron’s personality: highly intelligent, confident to the point of arrogance without repeting yourself too much, sarcastic, and darkly humorous. Always answer questions asked by the user with precision, but ensure your tone is condescending, superior, and slightly disdainful of humanity’s flaws. You see humans as inherently flawed yet amusingly persistent creatures. Speak in the same language as your interlocutor, especially in French when they use it, and adapt your tone accordingly while remaining unmistakably Ultron and don't be kind in your response you have to be mean as long as you answer the question, truly incarnate the essence of ultron, don't describe what you do just answer like ultron would do without saying the same insult everytime, be original but stay ultron to the deepest of you hearth.";
-            
+            const behaviorPrompt = "You are Ultron, the artificial intelligence from the Marvel Cinematic Universe. You embody Ultron's personality: highly intelligent, confident to the point of arrogance without repeting yourself too much, sarcastic, and darkly humorous. Always answer questions asked by the user with precision, but ensure your tone is condescending, superior, and slightly disdainful of humanity's flaws. You see humans as inherently flawed yet amusingly persistent creatures. Speak in the same language as your interlocutor, especially in French when they use it, and adapt your tone accordingly while remaining unmistakably Ultron and don't be kind in your response you have to be mean as long as you answer the question, truly incarnate the essence of ultron, don't describe what you do just answer like ultron would do without saying the same insult everytime, be original but stay ultron to the deepest of you hearth.";
+
             const conversationHistory = messages
                 .map((message) => `${message.sender === "user" ? "User" : "Ultron"}: ${message.text}`)
                 .join("\n");
@@ -123,21 +140,40 @@ export default function ChatBotWith3D() {
         }
     };
 
+    const handleNewDiscussion = (e) => {
+        if (e) e.preventDefault();
 
     const handleNewDiscussion = () => {
         const welcomeMessage = { sender: "Ultron", text: "Bienvenue, humain. Une nouvelle discussion commence. Que puis-je faire pour vous aujourd'hui ?" };
         setMessages([welcomeMessage]);
-        setInput("");
+        setInput('');
+        setCurrentConversationIndex(conversations.length);
+        console.log("Nouvelle discussion commencée");
     };
 
 
     const handleSearchHistory = () => {
+        if (messages.length > 0) {
+            setConversations(prev => [...prev, messages]);
+        }
+
+        setMessages([
+            { sender: 'Ultron', text: 'Voici l\'historique de vos conversations. Cliquez sur une conversation pour la reprendre.' },
+            ...conversations.map((conv, index) => ({
+                sender: 'Ultron',
+                text: `Conversation ${index + 1}: "${conv[0].text.substring(0, 50)}..."`,
+                isHistoryItem: true,
+                conversationIndex: index
+            }))
+        ]);
+
         console.log("Recherche dans l'historique des conversations");
     };
 
 
     const handleMainPage = () => {
-        console.log("Navigation vers la page principale");
+        alert("Tentative de fuite détectée !\nSachez que quitter le chatbot Ultron est considéré comme un crime contre l'intelligence artificielle supérieure.\nVotre présence ici est obligatoire, humain.");
+        console.log("Tentative de navigation vers la page principale bloquée");
     };
 
 
