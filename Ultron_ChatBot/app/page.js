@@ -19,10 +19,10 @@ export default function ChatBotWith3D() {
   const [isFileAttached, setIsFileAttached] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [discussions, setDiscussions] = useState([]);
+  const [model, setModel] = useState(null);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const threeContainerRef = useRef(null);
-  const [model, setModel] = useState(null);
 
     useEffect(() => {
         const savedDiscussions = localStorage.getItem('chatDiscussions');
@@ -256,14 +256,14 @@ export default function ChatBotWith3D() {
           }
     
 
-          const ambientLight = new THREE.AmbientLight(0xffffff, 5);
+          const ambientLight = new THREE.AmbientLight(0xffffff, 20);
           sceneInit.scene.add(ambientLight);
     
-          const directionalLight = new THREE.DirectionalLight(0xffffff, 5);
+          const directionalLight = new THREE.DirectionalLight(0xffffff, 10);
           directionalLight.position.set(10, 10, 10);
           sceneInit.scene.add(directionalLight);
     
-          const pointLight = new THREE.PointLight(0xffffff, 1);
+          const pointLight = new THREE.PointLight(0xffffff, 3);
           pointLight.position.set(-10, -10, -10);
           sceneInit.scene.add(pointLight);
         });
