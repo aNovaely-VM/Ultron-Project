@@ -20,6 +20,8 @@ export default function ChatBotWith3D() {
   const [showHistory, setShowHistory] = useState(false);
   const [discussions, setDiscussions] = useState([]);
   const [model, setModel] = useState(null);
+  const [currentTheme, setCurrentTheme] = useState('');
+  const [selectedDiscussionIndex, setSelectedDiscussionIndex] = useState(null);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const threeContainerRef = useRef(null);
@@ -212,7 +214,9 @@ export default function ChatBotWith3D() {
     };
 
     const handleSelectDiscussion = (discussion) => {
-        setCurrentTheme(discussion.theme);
+        if (discussion.theme) {
+            setCurrentTheme(discussion.theme);
+        }
         setMessages(discussion.messages);
     };
 
@@ -340,75 +344,77 @@ export default function ChatBotWith3D() {
         }
       }, [model, currentLetter]);
 
-    return (
-    <div className="layout">
-      <div ref={threeContainerRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
-        <canvas id="threeCanvas"></canvas>
-      </div>
-      <div className="ultron-background"></div>
-      <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
-        <div className="sidebar-content">
-          <div className="logo">U</div>
-          <nav>
-            <button className="icon-button" onClick={handleNewDiscussion} aria-label="New Discussion">
-              <span className="icon">+</span>
-              <span className="text">Nouvelle Discussion</span>
-            </button>
-            <button className="icon-button" onClick={handleSearchHistory} aria-label="Search History">
-              <span className="icon">H</span>
-              <span className="text">Historique</span>
-            </button>
-          </nav>
-          <button className="icon-button toggle-sidebar" onClick={toggleSidebar} aria-label="Toggle Sidebar">
-            <span className="icon">{isSidebarOpen ? '<' : '>'}</span>
-          </button>
-        </div>
-      </aside>
-      <main className="main-content">
-        <ImageUltron isSpeaking={isSpeaking} currentLetter={currentLetter} />
-        <div className="chatbot-window">
-          {showHistory ? (
-            <div className="history-view">
-              <h2>Historique</h2>
-              {discussions.length > 0 ? (
-                discussions.map((discussion, index) => (
-                  <div key={index} className="history-item" onClick={() => handleSelectDiscussion(discussion)}>
-                    <strong>{discussion.theme}</strong>
-                  </div>
-                ))
-              ) : (
-                <p>Aucune discussion disponible.</p>
-              )}
-              <div className="history-buttons-container">
-                <button className="close-history" onClick={() => setShowHistory(false)}>Fermer</button>
-                <button className="clear-history" onClick={handleClearHistory}>Vider</button>
-              </div>
+      return (
+        <div className="layout">
+          <div ref={threeContainerRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+            <canvas id="threeCanvas"></canvas>
+          </div>
+          <div className="ultron-background">
+            <div className="ultron-text">ULTRON</div>
+          </div>
+          <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+            <div className="sidebar-content">
+              <div className="logo">U</div>
+              <nav>
+                <button className="icon-button" onClick={handleNewDiscussion} aria-label="New Discussion">
+                  <span className="icon">+</span>
+                  <span className="text">Nouvelle Discussion</span>
+                </button>
+                <button className="icon-button" onClick={handleSearchHistory} aria-label="Search History">
+                  <span className="icon">H</span>
+                  <span className="text">Historique</span>
+                </button>
+              </nav>
+              <button className="icon-button toggle-sidebar" onClick={toggleSidebar} aria-label="Toggle Sidebar">
+                <span className="icon">{isSidebarOpen ? '<' : '>'}</span>
+              </button>
             </div>
-          ) : (
-            <div>
-              {messages.map((message, index) => (
-                <div key={index} className={`message ${message.sender === 'Ultron' ? 'ultron' : 'user'}`}>
-                  <div className="message-bubble">
-                    <strong>{message.sender === 'Ultron' ? 'Ultron' : 'You'}:</strong> {message.text}
+          </aside>
+          <main className="main-content">
+            <ImageUltron isSpeaking={isSpeaking} currentLetter={currentLetter} />
+            <div className="chatbot-window">
+              {showHistory ? (
+                <div className="history-view">
+                  <h2>Historique</h2>
+                  {discussions.length > 0 ? (
+                    discussions.map((discussion, index) => (
+                      <div key={index} className="history-item" onClick={() => handleSelectDiscussion(discussion)}>
+                        <strong>{discussion.theme}</strong>
+                      </div>
+                    ))
+                  ) : (
+                    <p>Aucune discussion disponible.</p>
+                  )}
+                  <div className="history-buttons-container">
+                    <button className="close-history" onClick={() => setShowHistory(false)}>Fermer</button>
+                    <button className="clear-history" onClick={handleClearHistory}>Vider</button>
                   </div>
                 </div>
-              ))}
-              <div ref={messagesEndRef} />
+              ) : (
+                <div>
+                  {messages.map((message, index) => (
+                    <div key={index} className={`message ${message.sender === 'Ultron' ? 'ultron' : 'user'}`}>
+                      <div className="message-bubble">
+                        <strong>{message.sender === 'Ultron' ? 'Ultron' : 'You'}:</strong> {message.text}
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </div>
+              )}
             </div>
-          )}
+            <ChatInput
+              input={input}
+              setInput={setInput}
+              sendMessage={sendMessage}
+              fileInputRef={fileInputRef}
+              handleFileChange={handleFileChange}
+              isLoading={isLoading}
+              isFileAttached={isFileAttached}
+            />
+          </main>
+          <div className="crt-effect"></div>
+          <div className="scanline"></div>
         </div>
-        <ChatInput
-          input={input}
-          setInput={setInput}
-          sendMessage={sendMessage}
-          fileInputRef={fileInputRef}
-          handleFileChange={handleFileChange}
-          isLoading={isLoading}
-          isFileAttached={isFileAttached}
-        />
-      </main>
-      <div className="crt-effect"></div>
-      <div className="scanline"></div>
-    </div>
-  );
+      );
 }
