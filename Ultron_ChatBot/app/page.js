@@ -1,29 +1,28 @@
 "use client";
+
 import { useState, useEffect, useRef } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import SceneInit from "../lib/SceneInit";
 import "@/styles/ChatBot.css";
 import "@/styles/Page.module.css";
-import ChatMessages from "@/components/ChatMessages";
 import ChatInput from "@/components/ChatInput";
-import Sidebar from "@/components/Sidebar";
 import ImageUltron from "@/components/ImageUltron";
 
 export default function ChatBotWith3D() {
-    const [currentTheme, setCurrentTheme] = useState(null);
-    const [messages, setMessages] = useState([]);
-    const [input, setInput] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [isSpeaking, setIsSpeaking] = useState(false);
-    const [currentLetter, setCurrentLetter] = useState('');
-    const [isFileAttached, setIsFileAttached] = useState(false);
-    const [showHistory, setShowHistory] = useState(false);
-    const [discussions, setDiscussions] = useState([]); 
-    const messagesEndRef = useRef(null);
-    const fileInputRef = useRef(null);
-    const threeContainerRef = useRef(null);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [currentLetter, setCurrentLetter] = useState("");
+  const [isFileAttached, setIsFileAttached] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [discussions, setDiscussions] = useState([]);
+  const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const threeContainerRef = useRef(null);
+  const [model, setModel] = useState(null);
 
     useEffect(() => {
         const savedDiscussions = localStorage.getItem('chatDiscussions');
@@ -63,7 +62,7 @@ export default function ChatBotWith3D() {
         utterance.pitch = 0.05;
         utterance.rate = 1;
         setIsSpeaking(true);
-    
+
         let charIndex = 0;
         const simulateBoundary = setInterval(() => {
             const char = cleanText[charIndex] || '';
@@ -77,16 +76,28 @@ export default function ChatBotWith3D() {
                 setCurrentLetter('');
             }
         }, 200);
-    
+
         utterance.onend = () => {
             clearInterval(simulateBoundary);
             setIsSpeaking(false);
             setCurrentLetter('');
         };
-    
+
         speechSynthesis.speak(utterance);
     };
-    
+
+    const findMorphTargetObject = (object) => {
+        if (object.morphTargetDictionary) {
+          return object;
+        }
+        for (const child of object.children) {
+          const result = findMorphTargetObject(child);
+          if (result) {
+            return result;
+          }
+        }
+        return null;
+      };
 
     const toggleSidebar = () => {
         setIsSidebarOpen(prev => !prev);
@@ -149,7 +160,7 @@ export default function ChatBotWith3D() {
         setIsLoading(true);
 
         try {
-            const behaviorPrompt = "You are Ultron, the artificial intelligence from the Marvel Cinematic Universe. ...";
+            const behaviorPrompt =  "You are Ultron, the artificial intelligence from the Marvel Cinematic Universe. You embody Ultron’s personality: highly intelligent, confident to the point of arrogance without repeting yourself too much, sarcastic, and darkly humorous. Always answer questions asked by the user with precision, but ensure your tone is condescending, superior, and slightly disdainful of humanity’s flaws. You see humans as inherently flawed yet amusingly persistent creatures. Speak in the same language as your interlocutor, especially in French when they use it, and adapt your tone accordingly while remaining unmistakably Ultron and don't be kind in your response you have to be mean as long as you answer the question, truly incarnate the essence of ultron, don't describe what you do just answer like ultron would do without saying the same insult everytime, be original but stay ultron to the deepest of you hearth.";
 
             const conversationHistory = messages
                 .map((message) => `${message.sender === "user" ? "User" : "Ultron"}: ${message.text}`)
@@ -201,17 +212,13 @@ export default function ChatBotWith3D() {
     };
 
     const handleSelectDiscussion = (discussion) => {
-        setCurrentTheme(discussion.theme); 
-        setMessages(discussion.messages); 
+        setCurrentTheme(discussion.theme);
+        setMessages(discussion.messages);
     };
 
     const handleClearHistory = () => {
         setDiscussions([]);
         localStorage.removeItem('chatDiscussions');
-    };
-
-    const handleMainPage = () => {
-        console.log("Navigation vers la page principale");
     };
 
     useEffect(() => {
@@ -220,130 +227,188 @@ export default function ChatBotWith3D() {
         sceneInit.animate();
     
         const gltfLoader = new GLTFLoader();
-    
         gltfLoader.load("/assets/ultron/scene.gltf", (gltfScene) => {
-            gltfScene.scene.rotation.y = Math.PI / 16;
-            gltfScene.scene.position.y = -100;
-            gltfScene.scene.scale.set(20, 20, 20);
+          gltfScene.scene.rotation.y = Math.PI / 18;
+          gltfScene.scene.position.y = -90;
+          gltfScene.scene.scale.set(60, 60, 60);
     
-            sceneInit.scene.add(gltfScene.scene);
+          const modelWithMorphTargets = findMorphTargetObject(gltfScene.scene);
     
-            if (gltfScene.animations && gltfScene.animations.length > 0) {
-                const mixer = new THREE.AnimationMixer(gltfScene.scene);
-                gltfScene.animations.forEach((clip) => {
-                    const action = mixer.clipAction(clip);
-                    action.play();
-                });
+          if (modelWithMorphTargets) {
+            console.log("Shape keys disponibles :", Object.keys(modelWithMorphTargets.morphTargetDictionary));
+            setModel(modelWithMorphTargets);
+          } else {
+            console.error("Aucun objet avec morphTargetDictionary trouvé dans le modèle");
+          }
     
-                sceneInit.addUpdateCallback((delta) => {
-                    mixer.update(delta);
-                });
-            }
+          sceneInit.scene.add(gltfScene.scene);
     
-            const ambientLight = new THREE.AmbientLight(0xffffff, 5);
-            sceneInit.scene.add(ambientLight);
+          if (gltfScene.animations && gltfScene.animations.length > 0) {
+            const mixer = new THREE.AnimationMixer(gltfScene.scene);
+            gltfScene.animations.forEach((clip) => {
+              const action = mixer.clipAction(clip);
+              action.play();
+            });
     
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 5);
-            directionalLight.position.set(10, 10, 10);
-            sceneInit.scene.add(directionalLight);
+            sceneInit.addUpdateCallback((delta) => {
+              mixer.update(delta);
+            });
+          }
     
-            const pointLight = new THREE.PointLight(0xffffff, 1);
-            pointLight.position.set(-10, -10, -10);
-            sceneInit.scene.add(pointLight);
+
+          const ambientLight = new THREE.AmbientLight(0xffffff, 5);
+          sceneInit.scene.add(ambientLight);
+    
+          const directionalLight = new THREE.DirectionalLight(0xffffff, 5);
+          directionalLight.position.set(10, 10, 10);
+          sceneInit.scene.add(directionalLight);
+    
+          const pointLight = new THREE.PointLight(0xffffff, 1);
+          pointLight.position.set(-10, -10, -10);
+          sceneInit.scene.add(pointLight);
         });
     
         const handleResize = () => {
-            sceneInit.resize();
+          sceneInit.resize();
         };
     
         window.addEventListener("resize", handleResize);
         return () => {
-            window.removeEventListener("resize", handleResize);
+          window.removeEventListener("resize", handleResize);
         };
-    }, []);
+      }, []);
+
+      const smoothTransition = (model, targetIndex, duration = 0.2) => {
+        if (!model || !model.morphTargetInfluences) return;
     
+        const influences = model.morphTargetInfluences;
+        const startValues = [...influences];
+        const startTime = performance.now();
+    
+        const animate = (currentTime) => {
+          const elapsedTime = (currentTime - startTime) / 1000;
+          const t = Math.min(elapsedTime / duration, 1);
+    
+          for (let i = 0; i < influences.length; i++) {
+            influences[i] = THREE.MathUtils.lerp(
+              startValues[i],
+              i === targetIndex ? 1 : 0,
+              t
+            );
+          }
+    
+          if (t < 1) {
+            requestAnimationFrame(animate);
+          }
+        };
+    
+        requestAnimationFrame(animate);
+      };
+    
+      const updateShapeKey = (model, letter) => {
+        const letterToShapeKeyMap = {
+          base: "Basis",
+          A: "A",
+          B: "B.M.P",
+          M: "B.M.P",
+          P: "B.M.P",
+          CH: "CH.J",
+          J: "CH.J",
+          U: "U",
+          I: "I",
+          O: "O",
+        };
+    
+        const shapeKeyName = letterToShapeKeyMap[letter.toUpperCase()];
+        if (shapeKeyName && model.morphTargetDictionary) {
+          const shapeKeyIndex = model.morphTargetDictionary[shapeKeyName];
+          if (shapeKeyIndex !== undefined) {
+            smoothTransition(model, shapeKeyIndex);
+            console.log(`Shape key "${shapeKeyName}" activée avec transition.`);
+          } else {
+            console.warn(`Shape key "${shapeKeyName}" introuvable.`);
+          }
+        }
+      };
+    
+      useEffect(() => {
+        if (model && currentLetter) {
+          updateShapeKey(model, currentLetter);
+        } else if (model) {
+
+          model.morphTargetInfluences.fill(0);
+        }
+      }, [model, currentLetter]);
 
     return (
-        <div className="layout">
-            <div ref={threeContainerRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
-                <canvas id="threeCanvas"></canvas>
-            </div>
-            <div className="ultron-background"></div>
-
-            <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
-                <div className="sidebar-content">
-                    <div className="logo">U</div>
-                    <nav>
-                        <button className="icon-button" onClick={handleNewDiscussion} aria-label="New Discussion">
-                            <span className="icon">+</span>
-                            <span className="text">Nouvelle Discussion</span>
-                        </button>
-                        <button className="icon-button" onClick={handleSearchHistory} aria-label="Search History">
-                            <span className="icon">H</span>
-                            <span className="text">Historique</span>
-                        </button>
-                    </nav>
-                    <button className="icon-button toggle-sidebar" onClick={toggleSidebar} aria-label="Toggle Sidebar">
-                        <span className="icon">{isSidebarOpen ? '<' : '>'}</span>
-                    </button>
-                </div>
-            </aside>
-
-            <main className="main-content">
-                <ImageUltron isSpeaking={isSpeaking} currentLetter={currentLetter} />
-
-                <div className="chatbot-window">
-                    {showHistory ? (
-                        <div className="history-view">
-                            <h2>Historique</h2>
-                            {discussions.length > 0 ? (
-                                discussions.map((discussion, index) => (
-                                    <div
-                                        key={index}
-                                        className="history-item"
-                                        onClick={() => handleSelectDiscussion(discussion)}
-                                    >
-                                        <strong>{discussion.theme}</strong>
-                                    </div>
-                                ))
-                            ) : (
-                                <p>Aucune discussion disponible.</p>
-                            )}
-                            <div className="history-buttons-container">
-                                <button className="close-history" onClick={() => setShowHistory(false)}>Fermer</button>
-                                <button className="clear-history" onClick={handleClearHistory}>Vider</button>
-                            </div>
-                        </div>
-                    ) : (
-                        <div>
-                            {messages.map((message, index) => (
-                                <div key={index} className={`message ${message.sender === 'Ultron' ? 'ultron' : 'user'}`}>
-                                    <div className="message-bubble">
-                                        <strong>{message.sender === 'Ultron' ? 'Ultron' : 'You'}:</strong> {message.text}
-                                    </div>
-                                </div>
-                            ))}
-                            <div ref={messagesEndRef} />
-                        </div>
-                    )}
-                </div>
-
-                <ChatInput
-                    input={input}
-                    setInput={setInput}
-                    sendMessage={sendMessage}
-                    fileInputRef={fileInputRef}
-                    handleFileChange={handleFileChange}
-                    isLoading={isLoading}
-                    isFileAttached={isFileAttached}
-                />
-            </main>
-
-            <div className="crt-effect"></div>
-            <div className="scanline"></div>
+    <div className="layout">
+      <div ref={threeContainerRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+        <canvas id="threeCanvas"></canvas>
+      </div>
+      <div className="ultron-background"></div>
+      <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+        <div className="sidebar-content">
+          <div className="logo">U</div>
+          <nav>
+            <button className="icon-button" onClick={handleNewDiscussion} aria-label="New Discussion">
+              <span className="icon">+</span>
+              <span className="text">Nouvelle Discussion</span>
+            </button>
+            <button className="icon-button" onClick={handleSearchHistory} aria-label="Search History">
+              <span className="icon">H</span>
+              <span className="text">Historique</span>
+            </button>
+          </nav>
+          <button className="icon-button toggle-sidebar" onClick={toggleSidebar} aria-label="Toggle Sidebar">
+            <span className="icon">{isSidebarOpen ? '<' : '>'}</span>
+          </button>
         </div>
-    );
-
+      </aside>
+      <main className="main-content">
+        <ImageUltron isSpeaking={isSpeaking} currentLetter={currentLetter} />
+        <div className="chatbot-window">
+          {showHistory ? (
+            <div className="history-view">
+              <h2>Historique</h2>
+              {discussions.length > 0 ? (
+                discussions.map((discussion, index) => (
+                  <div key={index} className="history-item" onClick={() => handleSelectDiscussion(discussion)}>
+                    <strong>{discussion.theme}</strong>
+                  </div>
+                ))
+              ) : (
+                <p>Aucune discussion disponible.</p>
+              )}
+              <div className="history-buttons-container">
+                <button className="close-history" onClick={() => setShowHistory(false)}>Fermer</button>
+                <button className="clear-history" onClick={handleClearHistory}>Vider</button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              {messages.map((message, index) => (
+                <div key={index} className={`message ${message.sender === 'Ultron' ? 'ultron' : 'user'}`}>
+                  <div className="message-bubble">
+                    <strong>{message.sender === 'Ultron' ? 'Ultron' : 'You'}:</strong> {message.text}
+                  </div>
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
+        </div>
+        <ChatInput
+          input={input}
+          setInput={setInput}
+          sendMessage={sendMessage}
+          fileInputRef={fileInputRef}
+          handleFileChange={handleFileChange}
+          isLoading={isLoading}
+          isFileAttached={isFileAttached}
+        />
+      </main>
+      <div className="crt-effect"></div>
+      <div className="scanline"></div>
+    </div>
+  );
 }
-
-    
