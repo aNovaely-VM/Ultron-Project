@@ -162,14 +162,13 @@ export default function ChatBotWith3D() {
           model.morphTargetInfluences[model.morphTargetDictionary[shapeKey]] = 0;
         }
       });
-      // Revenir à la shapekey "Basis"
       if (model.morphTargetDictionary["Basis"] !== undefined) {
         model.morphTargetInfluences[model.morphTargetDictionary["Basis"]] = 1;
       }
     }
   }, [model]);
 
-  const smoothTransition = useCallback((model, targetIndex, duration = 0.5) => { // Augmenter la durée pour une transition plus fluide
+  const smoothTransition = useCallback((model, targetIndex, duration = 0.5) => { 
     if (!model || !model.morphTargetInfluences) return;
 
     const influences = model.morphTargetInfluences;
