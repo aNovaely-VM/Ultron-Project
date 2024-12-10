@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import SceneInit from "../lib/SceneInit";
 import "@/styles/ChatBot.css";
-import "@/styles/Page.module.css";
+import "@/styles/page.module.css";
 import ChatInput from "@/components/ChatInput";
 import ImageUltron from "@/components/ImageUltron";
 
